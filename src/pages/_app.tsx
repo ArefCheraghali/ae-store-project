@@ -1,17 +1,12 @@
 import type { AppProps } from "next/app";
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import Navbar from "@/components/Navbar";
 import { CacheProvider } from "@emotion/react";
 import createEmotionCache from "@/createEmotionCache";
+import theme from "./theme";
 import { Vazirmatn } from "next/font/google";
 
 const clientSideEmotionCache = createEmotionCache();
-
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: "Vazirmatn, sans-serif",
-  },
-});
 
 const vazir = Vazirmatn({
   subsets: ["arabic"],
@@ -23,6 +18,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <CacheProvider value={clientSideEmotionCache}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <Navbar />
         <main className={vazir.className}>
           <Component {...pageProps} />
         </main>
