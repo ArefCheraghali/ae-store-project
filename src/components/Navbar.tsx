@@ -25,7 +25,7 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 export default function Navbar() {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
-  const { lang, toggleLanguage, t } = useContext(LanguageContext);
+  const { lang, toggleLanguage } = useContext(LanguageContext);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -33,7 +33,6 @@ export default function Navbar() {
 
   const toggleDrawer = (open: boolean) => () => setDrawerOpen(open);
 
-  // Keep nav items static in structure
   const navItems = [
     { key: "home", fa: "صفحه اصلی", en: "Home" },
     { key: "categories", fa: "دسته‌بندی‌ها", en: "Categories" },
@@ -61,9 +60,7 @@ export default function Navbar() {
     <Box sx={{ direction: "ltr" }}>
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          {/* Left controls: language + theme */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {/* Modern language toggle */}
             <ToggleButtonGroup
               value={lang}
               exclusive
@@ -104,9 +101,8 @@ export default function Navbar() {
             </Box>
           </Box>
 
-          {/* Center: title */}
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            AE Store
+            {lang === "fa" ? "آکالا" : "AKALA"}
           </Typography>
 
           {/* Right: nav or menu */}
@@ -127,10 +123,15 @@ export default function Navbar() {
       </AppBar>
 
       <Drawer
-        anchor={lang === "fa" ? "left" : "right"}
+        anchor="right"
         open={drawerOpen}
         onClose={toggleDrawer(false)}
-        sx={{ direction: lang === "fa" ? "ltr" : "rtl" }}
+        PaperProps={{
+          sx: { direction: "ltr" },
+        }}
+        SlideProps={{
+          direction: "right",
+        }}
       >
         {drawerContent}
       </Drawer>

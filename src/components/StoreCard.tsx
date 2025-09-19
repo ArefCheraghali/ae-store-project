@@ -28,7 +28,7 @@ export default function StoreCard({ store, categoryName }: StoreCardProps) {
         boxShadow: 3,
         borderRadius: 2,
         transition: "transform 0.2s ease",
-        "&:hover": { transform: "scale(1.02)" },
+        "&:hover": { transform: "scale(1.04)" },
       }}
     >
       <CardMedia

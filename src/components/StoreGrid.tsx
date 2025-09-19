@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useContext } from "react";
 import { Grid, Card, CardContent, Skeleton } from "@mui/material";
 import StoreCard from "./StoreCard";
@@ -48,10 +49,19 @@ export default function StoreGrid({
               size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
               sx={{ display: "flex" }}
             >
-              <StoreCard
-                store={store}
-                categoryName={getCategoryName(store.category_id)}
-              />
+              <Link
+                href={`/stores/${store.id}`}
+                style={{
+                  textDecoration: "none",
+                  width: "100%",
+                  display: "flex",
+                }}
+              >
+                <StoreCard
+                  store={store}
+                  categoryName={getCategoryName(store.category_id)}
+                />
+              </Link>
             </Grid>
           ))}
     </Grid>

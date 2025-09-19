@@ -1,6 +1,7 @@
 import type { AppProps } from "next/app";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { CacheProvider } from "@emotion/react";
 import createEmotionCache from "@/createEmotionCache";
 import { Vazirmatn } from "next/font/google";
@@ -43,17 +44,38 @@ export const LanguageContext = createContext<{
 });
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  const [mode, setMode] = useState<"light" | "dark">("light");
-  const [lang, setLang] = useState<Language>("fa");
+  const [mode, setMode] = useState<"light" | "dark">(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("themeMode") as "light" | "dark") || "light";
+    }
+    return "light";
+  });
+
+  const [lang, setLang] = useState<Language>(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("lang") as Language) || "fa";
+    }
+    return "fa";
+  });
+
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     document.dir = lang === "fa" ? "rtl" : "ltr";
   }, [lang]);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
-        setMode((prev) => (prev === "light" ? "dark" : "light"));
+        setMode((prev) => {
+          const next = prev === "light" ? "dark" : "light";
+          localStorage.setItem("themeMode", next);
+          return next;
+        });
       },
     }),
     []
@@ -62,7 +84,13 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const language = useMemo(
     () => ({
       lang,
-      toggleLanguage: () => setLang((prev) => (prev === "fa" ? "en" : "fa")),
+      toggleLanguage: () => {
+        setLang((prev) => {
+          const next = prev === "fa" ? "en" : "fa";
+          localStorage.setItem("lang", next);
+          return next;
+        });
+      },
       t: (key: TranslationKey) => translations[lang][key],
     }),
     [lang]
@@ -80,6 +108,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     [mode, lang]
   );
 
+  // Prevent flash: render nothing until mounted
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <CacheProvider value={clientSideEmotionCache}>
       <ColorModeContext.Provider value={colorMode}>
@@ -90,6 +123,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             <main className={vazir.className}>
               <Component {...pageProps} />
             </main>
+            <Footer />
           </ThemeProvider>
         </LanguageContext.Provider>
       </ColorModeContext.Provider>
