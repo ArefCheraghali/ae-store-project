@@ -33,7 +33,12 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         InputProps={{
           endAdornment: value && (
             <InputAdornment position="end">
-              <IconButton size="small" onClick={() => onChange("")} edge="end">
+              <IconButton
+                size="small"
+                onClick={() => onChange("")}
+                edge="end"
+                aria-label={lang === "fa" ? "پاک کردن جستجو" : "Clear search"}
+              >
                 <ClearIcon fontSize="small" />
               </IconButton>
             </InputAdornment>

@@ -14,6 +14,7 @@ import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
 import SortSelect from "@/components/SortSelect";
 import data from "@/data/data.json";
+import { getProcessedStores } from "@/utils/storeUtils";
 import { Store, Category } from "@/types";
 import { LanguageContext } from "@/pages/_app";
 
@@ -41,53 +42,27 @@ export default function HomePage() {
     return () => clearTimeout(timer);
   }, []);
 
-  const filteredStores = useMemo(() => {
+  const processedStores = useMemo(() => {
     if (!stores.length) return [];
-    const term = debouncedSearchTerm.trim().toLowerCase();
-    return stores.filter((store) => {
-      const nameToSearch = lang === "fa" ? store.name : store.name_en;
-      const matchesSearch = term
-        ? nameToSearch.toLowerCase().includes(term)
-        : true;
-      const matchesCategory = selectedCategory
-        ? store.category_id === selectedCategory
-        : true;
-      return matchesSearch && matchesCategory;
+    return getProcessedStores({
+      stores,
+      searchTerm: debouncedSearchTerm,
+      category: selectedCategory,
+      sortOption,
+      lang,
     });
-  }, [stores, debouncedSearchTerm, selectedCategory, lang]);
-
-  const sortedStores = useMemo(() => {
-    const arr = [...filteredStores];
-    arr.sort((a, b) => {
-      const nameA = lang === "fa" ? a.name : a.name_en;
-      const nameB = lang === "fa" ? b.name : b.name_en;
-
-      switch (sortOption) {
-        case "name-asc":
-          return nameA.localeCompare(nameB, lang === "fa" ? "fa" : "en");
-        case "name-desc":
-          return nameB.localeCompare(nameA, lang === "fa" ? "fa" : "en");
-        case "rating-desc":
-          return b.rating - a.rating;
-        case "rating-asc":
-          return a.rating - b.rating;
-        default:
-          return 0;
-      }
-    });
-    return arr;
-  }, [filteredStores, sortOption, lang]);
+  }, [stores, debouncedSearchTerm, selectedCategory, sortOption, lang]);
 
   const pageCount = useMemo(() => {
-    const count = Math.ceil(sortedStores.length / itemsPerPage);
+    const count = Math.ceil(processedStores.length / itemsPerPage);
     return Math.max(1, count);
-  }, [sortedStores.length, itemsPerPage]);
+  }, [processedStores.length, itemsPerPage]);
 
   const paginatedStores = useMemo(() => {
     const start = (page - 1) * itemsPerPage;
     const end = page * itemsPerPage;
-    return sortedStores.slice(start, end);
-  }, [sortedStores, page, itemsPerPage]);
+    return processedStores.slice(start, end);
+  }, [processedStores, page, itemsPerPage]);
 
   useEffect(() => {
     if (!stores.length) return;

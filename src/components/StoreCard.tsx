@@ -33,7 +33,7 @@ export default function StoreCard({ store, categoryName }: StoreCardProps) {
     >
       <CardMedia
         component="img"
-        loading="eager"
+        loading="lazy"
         height="180"
         image={store.imageUrl}
         alt={lang === "fa" ? store.name : store.name_en}
