@@ -1,10 +1,10 @@
-# 🛍️ Store Directory Project
+# 🛍️ AKALA Store Directory Project
 
 This is a responsive, feature-rich web application that displays a directory of stores. It was built as a front-end assessment and includes functionality for searching, filtering, sorting, and viewing store details. The project also features advanced capabilities such as multi-language support and a dark/light theme switcher.
 
 ## 🚀 Live Demo
 
-[**You can view the live demo here**](https://www.google.com/search?q=https://your-live-demo-link.vercel.app) *(\<- Replace with your Vercel/Netlify link)*
+[**You can view the live demo here**](https://www.google.com/search?q=https://your-live-demo-link.vercel.app) 
 
 -----
 
