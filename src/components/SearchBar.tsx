@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import {
   TextField,
   InputAdornment,
@@ -6,6 +7,7 @@ import {
   Box,
 } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
+import { LanguageContext } from "@/pages/_app";
 
 interface SearchBarProps {
   value: string;
@@ -13,14 +15,20 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ value, onChange }: SearchBarProps) {
+  const { lang } = useContext(LanguageContext);
+
   return (
     <Box>
-      <Typography>جست و جو بر اساس نام فروشگاه:</Typography>
+      <Typography sx={{ mb: 0.5 }}>
+        {lang === "fa"
+          ? "جست‌وجو بر اساس نام فروشگاه:"
+          : "Search by store name:"}
+      </Typography>
       <TextField
         fullWidth
         variant="outlined"
         value={value}
-        // label="جست و جو بر اساس نام فروشگاه"
+        placeholder={lang === "fa" ? "نام فروشگاه..." : "Store name..."}
         onChange={(e) => onChange(e.target.value)}
         InputProps={{
           endAdornment: value && (

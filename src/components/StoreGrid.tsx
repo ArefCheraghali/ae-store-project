@@ -1,6 +1,8 @@
+import { useContext } from "react";
 import { Grid, Card, CardContent, Skeleton } from "@mui/material";
 import StoreCard from "./StoreCard";
 import { Store, Category } from "@/types";
+import { LanguageContext } from "@/pages/_app";
 
 export default function StoreGrid({
   stores,
@@ -11,9 +13,12 @@ export default function StoreGrid({
   categories: Category[];
   isLoading: boolean;
 }) {
+  const { lang } = useContext(LanguageContext);
+
   const getCategoryName = (id: number) => {
     const category = categories.find((c) => c.id === id);
-    return category ? category.name_fa : "نامشخص";
+    if (!category) return lang === "fa" ? "نامشخص" : "Unknown";
+    return lang === "fa" ? category.name_fa : category.name_en;
   };
 
   return (

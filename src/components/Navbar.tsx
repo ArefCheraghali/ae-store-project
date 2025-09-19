@@ -14,15 +14,18 @@ import {
   useMediaQuery,
   useTheme,
   Switch,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { ColorModeContext } from "@/pages/_app";
-
-const navItems = ["صفحه اصلی", "دسته‌بندی‌ها", "تماس با ما"];
+import { ColorModeContext, LanguageContext } from "@/pages/_app";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 export default function Navbar() {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
+  const { lang, toggleLanguage, t } = useContext(LanguageContext);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -30,13 +33,23 @@ export default function Navbar() {
 
   const toggleDrawer = (open: boolean) => () => setDrawerOpen(open);
 
+  // Keep nav items static in structure
+  const navItems = [
+    { key: "home", fa: "صفحه اصلی", en: "Home" },
+    { key: "categories", fa: "دسته‌بندی‌ها", en: "Categories" },
+    { key: "contact", fa: "تماس با ما", en: "Contact Us" },
+  ];
+
   const drawerContent = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <List>
-        {navItems.map((text) => (
-          <ListItem key={text} disablePadding>
+        {navItems.map((item) => (
+          <ListItem key={item.key} disablePadding>
             <ListItemButton>
-              <ListItemText primary={text} sx={{ textAlign: "right" }} />
+              <ListItemText
+                primary={lang === "fa" ? item.fa : item.en}
+                sx={{ textAlign: lang === "fa" ? "right" : "left" }}
+              />
             </ListItemButton>
           </ListItem>
         ))}
@@ -45,10 +58,58 @@ export default function Navbar() {
   );
 
   return (
-    <>
+    <Box sx={{ direction: "ltr" }}>
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          {/* Left: menu or nav items */}
+          {/* Left controls: language + theme */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {/* Modern language toggle */}
+            <ToggleButtonGroup
+              value={lang}
+              exclusive
+              onChange={() => toggleLanguage()}
+              size="small"
+              sx={{
+                bgcolor: "background.paper",
+                borderRadius: 5,
+                overflow: "hidden",
+                "& .MuiToggleButton-root": {
+                  px: 1.5,
+                  py: 0.5,
+                  fontWeight: "bold",
+                  fontSize: "0.75rem",
+                  "&.Mui-selected": {
+                    bgcolor: "primary.main",
+                    color: "primary.contrastText",
+                  },
+                },
+              }}
+            >
+              <ToggleButton value="fa">FA</ToggleButton>
+              <ToggleButton value="en">EN</ToggleButton>
+            </ToggleButtonGroup>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              {isDark ? (
+                <Brightness4Icon fontSize="small" />
+              ) : (
+                <Brightness7Icon fontSize="small" />
+              )}
+              <Switch
+                checked={isDark}
+                onChange={colorMode.toggleColorMode}
+                color="default"
+                inputProps={{ "aria-label": "toggle light/dark mode" }}
+              />
+            </Box>
+          </Box>
+
+          {/* Center: title */}
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            AE Store
+          </Typography>
+
+          {/* Right: nav or menu */}
           {isMobile ? (
             <IconButton color="inherit" onClick={toggleDrawer(true)}>
               <MenuIcon />
@@ -56,36 +117,23 @@ export default function Navbar() {
           ) : (
             <Box>
               {navItems.map((item) => (
-                <Button key={item} color="inherit" sx={{ m: 1 }}>
-                  {item}
+                <Button key={item.key} color="inherit" sx={{ m: 1 }}>
+                  {lang === "fa" ? item.fa : item.en}
                 </Button>
               ))}
             </Box>
           )}
-
-          {/* Center: title */}
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            AE Store
-          </Typography>
-
-          {/* Right: theme switch */}
-          <Switch
-            checked={isDark}
-            onChange={colorMode.toggleColorMode}
-            color="default"
-            inputProps={{ "aria-label": "toggle light/dark mode" }}
-          />
         </Toolbar>
       </AppBar>
 
       <Drawer
-        anchor="left"
+        anchor={lang === "fa" ? "left" : "right"}
         open={drawerOpen}
         onClose={toggleDrawer(false)}
-        sx={{ direction: "rtl" }}
+        sx={{ direction: lang === "fa" ? "ltr" : "rtl" }}
       >
         {drawerContent}
       </Drawer>
-    </>
+    </Box>
   );
 }

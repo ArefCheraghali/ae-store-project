@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import {
   Card,
   CardMedia,
@@ -8,6 +9,7 @@ import {
   Stack,
 } from "@mui/material";
 import { Store } from "@/types";
+import { LanguageContext } from "@/pages/_app";
 
 interface StoreCardProps {
   store: Store;
@@ -15,6 +17,8 @@ interface StoreCardProps {
 }
 
 export default function StoreCard({ store, categoryName }: StoreCardProps) {
+  const { lang } = useContext(LanguageContext);
+
   return (
     <Card
       sx={{
@@ -32,7 +36,7 @@ export default function StoreCard({ store, categoryName }: StoreCardProps) {
         loading="eager"
         height="180"
         image={store.imageUrl}
-        alt={store.name}
+        alt={lang === "fa" ? store.name : store.name_en}
         sx={{ objectFit: "cover" }}
       />
       <CardContent sx={{ flexGrow: 1 }}>
@@ -46,7 +50,7 @@ export default function StoreCard({ store, categoryName }: StoreCardProps) {
             whiteSpace: "nowrap",
           }}
         >
-          {store.name}
+          {lang === "fa" ? store.name : store.name_en}
         </Typography>
 
         <Stack
@@ -56,25 +60,33 @@ export default function StoreCard({ store, categoryName }: StoreCardProps) {
           sx={{ mb: 1 }}
         >
           <Chip label={categoryName} color="primary" size="small" />
-          <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={0.5}
+            sx={{ direction: lang === "fa" ? "rtl" : "ltr" }}
+          >
             <Rating
               name={`rating-${store.id}`}
               value={store.rating}
               precision={0.1}
               readOnly
               size="small"
+              sx={{ direction: "ltr" }}
             />
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ fontWeight: 500 }}
+              sx={{ fontWeight: 500, position: "relative", top: "2px" }}
+              dir="ltr"
             >
-              {store.rating.toFixed(1)}
+              {store.rating.toLocaleString("en-US", {
+                minimumFractionDigits: 1,
+              })}
             </Typography>
           </Stack>
         </Stack>
 
-        {/* Description */}
         <Typography
           variant="body2"
           color="text.secondary"
@@ -85,7 +97,7 @@ export default function StoreCard({ store, categoryName }: StoreCardProps) {
             overflow: "hidden",
           }}
         >
-          {store.description}
+          {lang === "fa" ? store.description : store.description_en}
         </Typography>
       </CardContent>
     </Card>
