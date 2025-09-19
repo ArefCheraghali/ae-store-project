@@ -1,24 +1,88 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo, useContext } from "react";
+import { useDebounce } from "use-debounce";
 import {
   Container,
   Typography,
-  Card,
-  CardMedia,
-  CardContent,
-  Chip,
+  Paper,
+  Grid,
+  Pagination,
   Box,
+  Button,
 } from "@mui/material";
-import Grid from "@mui/material/GridLegacy";
+import StoreGrid from "@/components/StoreGrid";
+import SearchBar from "@/components/SearchBar";
+import CategoryFilter from "@/components/CategoryFilter";
+import SortSelect from "@/components/SortSelect";
 import data from "@/data/data.json";
+import { getProcessedStores } from "@/utils/storeUtils";
 import { Store, Category } from "@/types";
+import { LanguageContext } from "@/pages/_app";
 
 export default function HomePage() {
-  const [stores] = useState<Store[]>(data.stores);
-  const [categories] = useState<Category[]>(data.categories);
+  const { lang, t } = useContext(LanguageContext);
+  const itemsPerPage = 8;
 
-  const getCategoryName = (id: number) => {
-    const category = categories.find((c) => c.id === id);
-    return category ? category.name_fa : "نامشخص";
+  const [stores, setStores] = useState<Store[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
+  const [selectedCategory, setSelectedCategory] = useState<number | "">("");
+  const [sortOption, setSortOption] = useState("name-asc");
+  const [page, setPage] = useState(1);
+  const [displayedStores, setDisplayedStores] = useState<Store[]>([]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setStores(data.stores);
+      setCategories(data.categories);
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const processedStores = useMemo(() => {
+    if (!stores.length) return [];
+    return getProcessedStores({
+      stores,
+      searchTerm: debouncedSearchTerm,
+      category: selectedCategory,
+      sortOption,
+      lang,
+    });
+  }, [stores, debouncedSearchTerm, selectedCategory, sortOption, lang]);
+
+  const pageCount = useMemo(() => {
+    const count = Math.ceil(processedStores.length / itemsPerPage);
+    return Math.max(1, count);
+  }, [processedStores.length, itemsPerPage]);
+
+  const paginatedStores = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    const end = page * itemsPerPage;
+    return processedStores.slice(start, end);
+  }, [processedStores, page, itemsPerPage]);
+
+  useEffect(() => {
+    if (!stores.length) return;
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setDisplayedStores(paginatedStores);
+      setIsLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [stores.length, paginatedStores]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearchTerm, selectedCategory, sortOption, lang]);
+
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("");
+    setSortOption("name-asc");
+    setPage(1);
   };
 
   return (
@@ -29,75 +93,62 @@ export default function HomePage() {
         gutterBottom
         sx={{ fontWeight: "bold", textAlign: "center", mb: 4 }}
       >
-        فروشگاه‌ها
+        {t("stores")}
       </Typography>
 
-      <Grid container spacing={3}>
-        {stores.map((store) => (
-          <Grid
-            item
-            key={store.id}
-            xs={12}
-            sm={6}
-            md={4}
-            lg={3}
-            sx={{ display: "flex" }}
-          >
-            <Card
-              sx={{
-                flexGrow: 1,
-                display: "flex",
-                flexDirection: "column",
-                boxShadow: 3,
-                borderRadius: 2,
-                transition: "transform 0.2s ease",
-                "&:hover": { transform: "scale(1.02)" },
-              }}
-            >
-              <CardMedia
-                component="img"
-                height="180"
-                image={store.imageUrl}
-                alt={store.name}
-                sx={{ objectFit: "cover" }}
-              />
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: "bold",
-                    mb: 1,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {store.name}
-                </Typography>
-                <Box sx={{ mb: 1 }}>
-                  <Chip
-                    label={getCategoryName(store.category_id)}
-                    color="primary"
-                    size="small"
-                  />
-                </Box>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                  }}
-                >
-                  {store.description}
-                </Typography>
-              </CardContent>
-            </Card>
+      <Paper elevation={3} sx={{ p: 2, mb: 4, borderRadius: 2 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid size={{ xs: 12, md: 3 }}>
+            <SearchBar value={searchTerm} onChange={setSearchTerm} />
           </Grid>
-        ))}
-      </Grid>
+          <Grid size={{ xs: 12, md: 3 }}>
+            <CategoryFilter
+              categories={categories}
+              selected={selectedCategory}
+              onChange={setSelectedCategory}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 3 }}>
+            <SortSelect value={sortOption} onChange={setSortOption} />
+          </Grid>
+          <Grid
+            size={{ xs: 12, md: 3 }}
+            sx={{
+              mt: 5.5,
+              display: "flex",
+              justifyContent: { xs: "flex-start", md: "flex-end" },
+              alignItems: "flex-end",
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleResetFilters}
+              fullWidth={lang === "fa" || true} // full width on mobile
+            >
+              {lang === "fa" ? "بازنشانی" : "Reset"}
+            </Button>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <StoreGrid
+        stores={displayedStores}
+        categories={categories}
+        isLoading={isLoading}
+      />
+
+      {!isLoading && pageCount > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <Pagination
+            count={pageCount}
+            page={page}
+            onChange={(_, value) => setPage(value)}
+            color="primary"
+            shape="rounded"
+          />
+        </Box>
+      )}
     </Container>
   );
 }
