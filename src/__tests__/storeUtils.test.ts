@@ -1,4 +1,3 @@
-// src/utils/storeUtils.test.ts
 import { getProcessedStores } from "@/utils/storeUtils";
 import data from "@/data/data.json";
 import { Store } from "@/types";

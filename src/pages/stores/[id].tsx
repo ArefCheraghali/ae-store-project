@@ -1,5 +1,3 @@
-// pages/store/[id].tsx
-
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";

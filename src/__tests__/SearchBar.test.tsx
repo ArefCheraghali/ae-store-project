@@ -1,10 +1,8 @@
-// src/__tests__/SearchBar.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import SearchBar from "@/components/SearchBar";
 import { LanguageContext } from "@/pages/_app";
 
-// Mock the context. No changes needed here, your mock is perfect.
 jest.mock("@/pages/_app", () => ({
   __esModule: true,
   LanguageContext: React.createContext({
@@ -18,7 +16,6 @@ describe("SearchBar", () => {
   it("renders placeholder, calls onChange, and clears input correctly", () => {
     const onChange = jest.fn();
 
-    // Initial render with an empty value
     const { rerender } = render(
       <LanguageContext.Provider
         value={{ lang: "en", toggleLanguage: () => {}, t: (k) => k }}
@@ -36,7 +33,6 @@ describe("SearchBar", () => {
     // Assert that the onChange function was called with the correct value
     expect(onChange).toHaveBeenCalledWith("Coffee");
 
-    // --- The Fix ---
     // Re-render the component with the new value to make the clear button appear
     rerender(
       <LanguageContext.Provider
@@ -46,8 +42,7 @@ describe("SearchBar", () => {
       </LanguageContext.Provider>
     );
 
-    // Now, find the clear button and click it
-    // Using `getByRole` is great for accessibility.
+    // find the clear button and click it
     const clearButton = screen.getByRole("button", { name: /clear/i });
     fireEvent.click(clearButton);
 
@@ -55,7 +50,6 @@ describe("SearchBar", () => {
     expect(onChange).toHaveBeenCalledWith("");
   });
 
-  // Your second test case is perfect, no changes needed!
   it("switches to Persian placeholder when lang is fa", () => {
     const onChange = jest.fn();
     render(
@@ -66,8 +60,6 @@ describe("SearchBar", () => {
       </LanguageContext.Provider>
     );
 
-    expect(
-      screen.getByPlaceholderText("نام فروشگاه...")
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("نام فروشگاه...")).toBeInTheDocument();
   });
 });

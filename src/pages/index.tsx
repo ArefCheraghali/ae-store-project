@@ -124,7 +124,7 @@ export default function HomePage() {
               variant="outlined"
               color="secondary"
               onClick={handleResetFilters}
-              fullWidth={lang === "fa" || true} // full width on mobile
+              fullWidth={lang === "fa" || true}
             >
               {lang === "fa" ? "بازنشانی" : "Reset"}
             </Button>

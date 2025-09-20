@@ -1,5 +1,4 @@
-// src/utils/storeUtils.ts
-import { Store } from "@/types"; // Make sure your types are correctly imported
+import { Store } from "@/types";
 
 export function getProcessedStores({
   stores,
@@ -14,7 +13,6 @@ export function getProcessedStores({
   sortOption: string;
   lang: "fa" | "en";
 }): Store[] {
-  // 1. Filtering Logic
   const filteredStores = stores.filter((store) => {
     const term = searchTerm.trim().toLowerCase();
     const nameToSearch = lang === "fa" ? store.name : store.name_en;
@@ -28,7 +26,6 @@ export function getProcessedStores({
     return matchesSearch && matchesCategory;
   });
 
-  // 2. Sorting Logic
   const sortedStores = [...filteredStores];
   sortedStores.sort((a, b) => {
     const nameA = lang === "fa" ? a.name : a.name_en;
