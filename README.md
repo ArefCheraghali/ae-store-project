@@ -4,7 +4,7 @@ This is a responsive, feature-rich web application that displays a directory of 
 
 ## 🚀 Live Demo
 
-[**You can view the live demo here**](https://www.google.com/search?q=https://your-live-demo-link.vercel.app) 
+[**You can view the live demo here**](https://ae-store-project.vercel.app) 
 
 -----
 
